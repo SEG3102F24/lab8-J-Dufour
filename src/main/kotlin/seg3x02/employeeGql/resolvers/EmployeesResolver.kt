@@ -13,8 +13,7 @@ import java.util.UUID
 
 @Controller
 class EmployeesResolver(
-    private val employeesRepository: EmployeesRepository,
-    private val mongoOperations: MongoOperations
+    private val employeesRepository: EmployeesRepository
 ) {
     @QueryMapping
     fun employees(): List<Employee> {
@@ -22,10 +21,11 @@ class EmployeesResolver(
     }
 
     @MutationMapping
-    fun addEmployee(@Argument("createEmployeeInput") input: CreateEmployeeInput): Employee {
+    fun newEmployee(@Argument("createEmployeeInput") input: CreateEmployeeInput): Employee {
         if(input.name != null && input.dateOfBirth !=null && input.city != null && input.salary != null){
             val employee: Employee = Employee(input.name, input.dateOfBirth, input.city, input.salary, input.gender, input.email)
             employee.id = UUID.randomUUID().toString()
+            employeesRepository.save(employee)
             return employee
         } else {
             throw Exception("Invalid input")
